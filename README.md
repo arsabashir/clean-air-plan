@@ -2,7 +2,7 @@
 
 A GenAI assistant that helps families deal with severe winter smog and urban air pollution. Built for PromptWars, Challenge 6: Urban Air Quality Assistant.
 
-**Live app:** PASTE-YOUR-STREAMLIT-LINK-HERE
+**Live app:**https://clean-air-plan-ag947fpq9vgjk5begxxjhu.streamlit.app/
 
 ## The problem
 
