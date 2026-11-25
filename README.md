@@ -1,56 +1,68 @@
 # Clear Air Plan
 
-A GenAI assistant that helps families deal with severe winter smog and urban air pollution. Built for PromptWars, Challenge 6: Urban Air Quality Assistant.
+Built for PromptWars, Challenge 6: Urban Air Quality Assistant.
 
-**Live app:**https://clean-air-plan-ag947fpq9vgjk5begxxjhu.streamlit.app/
+**Live app:** YOUR_APP_LINK
 
 ## The problem
 
-In many cities, winter smog pushes AQI into unhealthy ranges for weeks. Families get generic advice ("stay indoors") that ignores their situation: a household with an asthmatic child and a long car commute needs a different plan than two adults who work from home.
+In winter, many cities sit under heavy smog. Families know the air is bad but not what to change: when to go out, how to protect the people at home who are most at risk, and which habits actually cut pollution.
 
 ## What it does
 
-1. The user enters a city and a short household profile: children, elderly members, health conditions, commute, home type, heating or cooking fuel, and budget.
-2. The app pulls live AQI, PM2.5, wind and humidity for that city, and finds the cleanest hour of the day.
-3. Gemini turns that data into a personal plan:
-   - Low-emission daily routine
-   - Indoor air quality hacks
-   - Sustainable alternatives for their location and budget
-   - Mask and health guidance, shown only at the AQI levels where it matters
-   - One measurable goal for the week
-4. Every suggestion carries a one-line explanation of its direct impact, so people see why a choice matters.
-5. A separate calculator (plain Python, not the LLM) estimates weekly commute CO2 and the saving from swapping two driving days.
+Enter your city and a few details about your household (children, older adults, health conditions, commute, home type, heating and cooking, budget). The app pulls live air quality and weather for your location, then Gemini builds a plan:
 
-## How the Gemini part works
+- A low-emission daily routine
+- Indoor air quality hacks
+- Sustainable alternatives suited to your area
+- The best time of day to go outside
+- Mask and health guidance that only appears when the AQI calls for it
+- One measurable goal for the week
 
-- Model: Gemini 2.5 Flash through the Google GenAI SDK.
-- Output is forced into a Pydantic JSON schema, so the UI always gets the same fields.
-- The system prompt tells the model to:
-  - use only the supplied readings and never invent numbers
-  - label every figure as an estimate
-  - recommend N95 or FFP2 masks only above AQI 150 (above 100 for sensitive members)
-  - avoid medical diagnoses and defer to a doctor's action plan
-  - write in plain language a family can follow
+Every suggestion includes a one-line explanation of its direct impact. A calculated (non-AI) commute CO2 estimate shows the math behind switching trips.
+
+## How Gemini is used
+
+- Model: Gemini 2.5 Flash through the Google GenAI SDK (Gemini API).
+- Input: live AQI, PM2.5, PM10, NO2, ozone, temperature, humidity and wind, plus the household profile.
+- Output: structured JSON enforced by a Pydantic response schema, so the UI always renders cleanly.
+- System prompt rules: use only the supplied readings, label every number as an estimate, recommend N95 masks only at high AQI, give no medical diagnoses, and keep the language simple enough for families.
+
+## Data
+
+Air quality and weather come from [Open-Meteo](https://open-meteo.com/) (no API key needed).
 
 ## Run it locally
 
-```bash
-pip install -r requirements.txt
-export GEMINI_API_KEY="your key from aistudio.google.com"
-streamlit run app.py
+```
+python -m pip install -r requirements.txt
+set GEMINI_API_KEY=your_key      # Windows CMD
+python -m streamlit run app.py
 ```
 
-On Windows PowerShell, use `$env:GEMINI_API_KEY="your key"` instead of `export`.
+On Mac or Linux, use `export GEMINI_API_KEY=your_key`. You can also paste the key into the sidebar box when the app opens.
 
-## Deploy
+The "Override AQI" field lets you simulate a smog day to test the plan.
 
-Deployed on Streamlit Community Cloud. The API key is stored in the app's Secrets (`GEMINI_API_KEY`), never in the repo.
+## Tests
 
-## Data sources
+```
+python -m pip install -r requirements-dev.txt
+python -m pytest
+```
 
-- Air quality and weather: [Open-Meteo](https://open-meteo.com) (Copernicus Atmosphere Monitoring Service model data)
-- Geocoding: Open-Meteo Geocoding API
+39 unit tests cover AQI banding and WCAG colour contrast, the deterministic mask rule, commute CO2 maths, input sanitising, Open-Meteo parsing (with mocked network calls), prompt building, and the Gemini response schema. Tests run automatically on every push through GitHub Actions.
 
-## Limits and disclaimer
+## Structure
 
-This tool gives general guidance, not medical advice. Modelled AQI can differ from a nearby ground sensor. Anyone with asthma, heart or lung conditions should follow their doctor's plan. Impact figures are estimates.
+- `app.py`: Streamlit interface and Gemini call
+- `core.py`: pure logic (data fetching, AQI rules, schema, prompt), no UI dependency
+- `tests/test_core.py`: unit tests
+
+## Accessibility
+
+AQI colours meet WCAG AA contrast, the AQI card is a live region with a text summary, status is never shown by colour alone, all inputs have labels and help text, and decorative emoji are hidden from screen readers.
+
+## Note
+
+This app gives general guidance, not medical advice. People with asthma, heart or lung conditions should follow their doctor's plan.
