@@ -2,7 +2,7 @@
 
 Built for PromptWars, Challenge 6: Urban Air Quality Assistant.
 
-**Live app:** YOUR_APP_LINK
+**Live app:** https://clean-air-plan-ag947fpq9vgjk5begxxjhu.streamlit.app/
 
 ## The problem
 
