@@ -57,7 +57,7 @@ python -m pytest
 
 - `app.py`: Streamlit interface and Gemini call
 - `core.py`: pure logic (data fetching, AQI rules, schema, prompt), no UI dependency
-- `tests/test_core.py`: unit tests
+- `test_core.py`: unit tests
 
 ## Accessibility
 
